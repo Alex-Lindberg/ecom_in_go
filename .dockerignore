@@ -1,0 +1,6 @@
+# .dockerignore
+venv
+
+scripts
+
+__pycache__
