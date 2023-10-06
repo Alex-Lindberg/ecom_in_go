@@ -74,15 +74,18 @@ func (store *PGStore) GetOrderByID(orderID int) (*models.Order, error) {
 	return &order, nil
 }
 
-func (store *PGStore) GetOrdersByFilter(customerIDs []int, orderReferences []string) ([]models.Order, error) {
+func (store *PGStore) GetOrdersByFilter(orderIDs []string, customerIDs []int, orderReferences []string) ([]models.Order, error) {
 	var orders []models.Order
 	query := store.DB
 
-	if len(customerIDs) > 0 {
-		query = query.Or("customer_id IN (?)", customerIDs)
+	if len(orderIDs) > 0 {
+		query = query.Or("order_id IN (?)", orderIDs)
 	}
 	if len(orderReferences) > 0 {
 		query = query.Or("order_reference IN (?)", orderReferences)
+	}
+	if len(customerIDs) > 0 {
+		query = query.Or("customer_id IN (?)", customerIDs)
 	}
 
 	if err := query.Find(&orders).Error; err != nil {

@@ -3,7 +3,6 @@ package api
 import (
 	"ecom_in_go/storage"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -17,12 +16,19 @@ type OrderHandler struct {
 
 func (h *OrderHandler) GetOrders(w http.ResponseWriter, r *http.Request) {
 	var cIDs []int
-	var oRefs []string
+	var oIDs, oRefs []string
 
-	customerIDs, ok1 := r.URL.Query()["customerIds"]
-	orderReferences, ok2 := r.URL.Query()["orderReferences"]
-	fmt.Printf("orderReferences: %v\n", orderReferences)
-	if ok1 && len(customerIDs[0]) > 0 {
+	orderIDs, ok1 := r.URL.Query()["orderIds"]
+	customerIDs, ok2 := r.URL.Query()["customerIds"]
+	orderReferences, ok3 := r.URL.Query()["orderReferences"]
+
+	if ok1 && len(orderIDs[0]) > 0 {
+		for _, str := range strings.Split(orderIDs[0], ",") {
+			oIDs = append(oIDs, str)
+		}
+	}
+
+	if ok2 && len(customerIDs[0]) > 0 {
 		for _, id := range strings.Split(customerIDs[0], ",") {
 			if i, err := strconv.Atoi(id); err == nil {
 				cIDs = append(cIDs, i)
@@ -30,12 +36,13 @@ func (h *OrderHandler) GetOrders(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	if ok2 && len(orderReferences[0]) > 0 {
+	if ok3 && len(orderReferences[0]) > 0 {
 		for _, str := range strings.Split(orderReferences[0], ",") {
 			oRefs = append(oRefs, str)
 		}
 	}
-	orders, err := h.OrderStore.GetOrdersByFilter(cIDs, oRefs)
+
+	orders, err := h.OrderStore.GetOrdersByFilter(oIDs, cIDs, oRefs)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
