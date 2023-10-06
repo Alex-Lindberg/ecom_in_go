@@ -1,6 +1,17 @@
 # Ecommerce backend in Go
 
-### Goal package structure
+Testing out programming in Go. 
+
+This project consists of a small ecommerce backend service.
+To run I usually use:
+
+```shell
+docker-compose up -d && docker-compose logs -f app
+```
+
+### Package structure
+
+Borrowed a structure form somewhere, using as a rough guidline.
 
 [Directory/Package]: [Functionality]
 - api: Delivery layer

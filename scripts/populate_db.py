@@ -1,3 +1,7 @@
+"""
+    Work in progress until I figure out what fields I need for each table
+    and how to generate fake data for them.
+"""
 import psycopg2
 from faker import Faker
 import random
