@@ -46,18 +46,19 @@ INSERT INTO customers ("name", email) VALUES ('Customer 3', 'customer3@example.c
 
 CREATE TABLE orders (
     id SERIAL PRIMARY KEY,
-    order_number VARCHAR(255) NOT NULL,
+    order_id VARCHAR(255) NOT NULL,                 -- The id the customer sees
+    order_reference VARCHAR(255) NOT NULL,          -- The id the business/platform uses
     customer_id INTEGER REFERENCES customers(id),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
-INSERT INTO orders (order_number, customer_id) VALUES ('ORDER123', 1);
-INSERT INTO orders (order_number, customer_id) VALUES ('ORDER124', 1);
-INSERT INTO orders (order_number, customer_id) VALUES ('ORDER125', 1);
-INSERT INTO orders (order_number, customer_id) VALUES ('ORDER126', 2);
-INSERT INTO orders (order_number, customer_id) VALUES ('ORDER127', 2);
-INSERT INTO orders (order_number, customer_id) VALUES ('ORDER128', 3);
+INSERT INTO orders (order_id, order_reference, customer_id) VALUES ('123', 'ORDER123', 1);
+INSERT INTO orders (order_id, order_reference, customer_id) VALUES ('124', 'ORDER124', 1);
+INSERT INTO orders (order_id, order_reference, customer_id) VALUES ('125', 'ORDER125', 1);
+INSERT INTO orders (order_id, order_reference, customer_id) VALUES ('126', 'ORDER126', 2);
+INSERT INTO orders (order_id, order_reference, customer_id) VALUES ('127', 'ORDER127', 2);
+INSERT INTO orders (order_id, order_reference, customer_id) VALUES ('128', 'ORDER128', 3);
 
 CREATE TABLE order_lines (
     id SERIAL PRIMARY KEY,

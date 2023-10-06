@@ -16,19 +16,12 @@ type OrderHandler struct {
 }
 
 func (h *OrderHandler) GetOrders(w http.ResponseWriter, r *http.Request) {
-	var cIDs, oNums []int
+	var cIDs []int
+	var oRefs []string
 
 	customerIDs, ok1 := r.URL.Query()["customerIds"]
-	orderNumbers, ok2 := r.URL.Query()["orderNumbers"]
-
-	fmt.Printf("customerIDs: %v, ok1: %v\n", customerIDs, ok1)
-	fmt.Printf("orderNumbers: %v, ok2: %v\n", orderNumbers, ok2)
-
-	if ok1 && ok2 {
-		http.Error(w, "Cannot filter by both customer IDs and order numbers at the same time", http.StatusBadRequest)
-		return
-	}
-
+	orderReferences, ok2 := r.URL.Query()["orderReferences"]
+	fmt.Printf("orderReferences: %v\n", orderReferences)
 	if ok1 && len(customerIDs[0]) > 0 {
 		for _, id := range strings.Split(customerIDs[0], ",") {
 			if i, err := strconv.Atoi(id); err == nil {
@@ -37,15 +30,12 @@ func (h *OrderHandler) GetOrders(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	if ok2 && len(orderNumbers[0]) > 0 {
-		for _, num := range strings.Split(orderNumbers[0], ",") {
-			if i, err := strconv.Atoi(num); err == nil {
-				oNums = append(oNums, i)
-			}
+	if ok2 && len(orderReferences[0]) > 0 {
+		for _, str := range strings.Split(orderReferences[0], ",") {
+			oRefs = append(oRefs, str)
 		}
 	}
-
-	orders, err := h.OrderStore.GetOrdersByFilter(cIDs, oNums)
+	orders, err := h.OrderStore.GetOrdersByFilter(cIDs, oRefs)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
