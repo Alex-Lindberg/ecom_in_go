@@ -20,6 +20,11 @@ type CustomerStore interface {
 type OrderStore interface {
 	GetOrdersByCustomerID(customerID int) ([]models.Order, error)
 	GetOrdersByOrderReference(orderReference int) (*models.Order, error)
-	GetOrdersByFilter(orderIDs []string, customerIDs []int, orderReferences []string) ([]models.Order, error)
-	GetOrderByID(orderID int) (*models.Order, error)
+	GetOrdersByFilter(orderIDs []int, orderNumbers []string, customerIDs []int, orderReferences []string) ([]models.Order, error)
+	GetOrderByID(orderID string) (*models.Order, error)
+}
+
+type OrderLineStore interface {
+	GetOrderLinesByOrderID(orderID string) ([]models.OrderLine, error)
+	GetOrderLinesByOrderIDs(orderIDs []string) (map[string][]models.OrderLine, error)
 }

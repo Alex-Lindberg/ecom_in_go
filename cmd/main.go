@@ -51,6 +51,7 @@ func startHttpServer(db *gorm.DB) *http.Server {
 	variantHandler := &api.VariantHandler{VariantStore: store}
 	customerHandler := &api.CustomerHandler{CustomerStore: store}
 	orderHandler := &api.OrderHandler{OrderStore: store}
+	orderLineHandler := &api.OrderLineHandler{OrderLineStore: store}
 
 	router.HandleFunc("/products", productHandler.GetProducts).Methods("GET")
 	router.HandleFunc("/product/{id:[0-9]+}", productHandler.GetProduct).Methods("GET")
@@ -59,6 +60,7 @@ func startHttpServer(db *gorm.DB) *http.Server {
 	router.HandleFunc("/customer/{id:[0-9]+}", customerHandler.GetCustomer).Methods("GET")
 	router.HandleFunc("/orders", orderHandler.GetOrders).Methods("GET")
 	router.HandleFunc("/order/{id:[0-9]+}", orderHandler.GetOrder).Methods("GET")
+	router.HandleFunc("/orderlines", orderLineHandler.GetOrderLines).Methods("GET")
 
 	http.Handle("/", router)
 	log.Println("Creating HTTP server instance")

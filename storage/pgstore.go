@@ -66,7 +66,7 @@ func (store *PGStore) GetOrdersByOrderReference(orderReference int) (*models.Ord
 	return &order, nil
 }
 
-func (store *PGStore) GetOrderByID(orderID int) (*models.Order, error) {
+func (store *PGStore) GetOrderByID(orderID string) (*models.Order, error) {
 	var order models.Order
 	if err := store.DB.Where("id = ?", orderID).Find(&order).Error; err != nil {
 		return nil, err
@@ -74,12 +74,15 @@ func (store *PGStore) GetOrderByID(orderID int) (*models.Order, error) {
 	return &order, nil
 }
 
-func (store *PGStore) GetOrdersByFilter(orderIDs []string, customerIDs []int, orderReferences []string) ([]models.Order, error) {
+func (store *PGStore) GetOrdersByFilter(orderIDs []int, orderNumbers []string, customerIDs []int, orderReferences []string) ([]models.Order, error) {
 	var orders []models.Order
 	query := store.DB
 
 	if len(orderIDs) > 0 {
-		query = query.Or("order_id IN (?)", orderIDs)
+		query = query.Or("id IN (?)", orderIDs)
+	}
+	if len(orderNumbers) > 0 {
+		query = query.Or("order_number IN (?)", orderNumbers)
 	}
 	if len(orderReferences) > 0 {
 		query = query.Or("order_reference IN (?)", orderReferences)
@@ -92,4 +95,26 @@ func (store *PGStore) GetOrdersByFilter(orderIDs []string, customerIDs []int, or
 		return nil, err
 	}
 	return orders, nil
+}
+
+func (store *PGStore) GetOrderLinesByOrderID(orderID string) ([]models.OrderLine, error) {
+	var orderLines []models.OrderLine
+	println(orderID)
+	if err := store.DB.Where("order_id = ?", orderID).Find(&orderLines).Error; err != nil {
+		return nil, err
+	}
+	return orderLines, nil
+}
+
+func (store *PGStore) GetOrderLinesByOrderIDs(orderIDs []string) (map[string][]models.OrderLine, error) {
+	var orderLines []models.OrderLine
+	if err := store.DB.Where("order_id IN (?)", orderIDs).Find(&orderLines).Error; err != nil {
+		return nil, err
+	}
+
+	orderLinesMap := make(map[string][]models.OrderLine)
+	for _, orderLine := range orderLines {
+		orderLinesMap[orderLine.OrderID] = append(orderLinesMap[orderLine.OrderID], orderLine)
+	}
+	return orderLinesMap, nil
 }
