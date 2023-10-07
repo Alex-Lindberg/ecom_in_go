@@ -9,11 +9,10 @@ CREATE TABLE products (
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
-INSERT INTO products ("name") VALUES ('Product 1');
-INSERT INTO products ("name") VALUES ('Product 2');
-INSERT INTO products ("name") VALUES ('Product 3');
-INSERT INTO products ("name") VALUES ('Product 4');
-INSERT INTO products ("name") VALUES ('Product 5');
+INSERT INTO products ("name") VALUES ('Product A');
+INSERT INTO products ("name") VALUES ('Product B');
+INSERT INTO products ("name") VALUES ('Product C');
+
 
 CREATE TABLE variants (
     id SERIAL PRIMARY KEY,
@@ -23,14 +22,11 @@ CREATE TABLE variants (
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
-INSERT INTO variants (product_id, "name") VALUES (1, 'Variant 1A');
-INSERT INTO variants (product_id, "name") VALUES (1, 'Variant 1B');
-INSERT INTO variants (product_id, "name") VALUES (2, 'Variant 2A');
-INSERT INTO variants (product_id, "name") VALUES (3, 'Variant 3A');
-INSERT INTO variants (product_id, "name") VALUES (3, 'Variant 3B');
-INSERT INTO variants (product_id, "name") VALUES (3, 'Variant 3C');
-INSERT INTO variants (product_id, "name") VALUES (4, 'Variant 4A');
-INSERT INTO variants (product_id, "name") VALUES (5, 'Variant 5A');
+INSERT INTO variants (product_id, "name") VALUES (1, 'Variant A1');
+INSERT INTO variants (product_id, "name") VALUES (1, 'Variant A2');
+INSERT INTO variants (product_id, "name") VALUES (2, 'Variant B1');
+INSERT INTO variants (product_id, "name") VALUES (3, 'Variant C1');
+
 
 CREATE TABLE customers (
     id SERIAL PRIMARY KEY,
@@ -71,20 +67,35 @@ CREATE TABLE order_lines (
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
+-- Order 1
 INSERT INTO order_lines (order_id, product_id, variant_id, price, quantity) VALUES (1, 1, 1, 2000, 2);
-INSERT INTO order_lines (order_id, product_id, variant_id, price, quantity) VALUES (1, 2, 3, 3000, 1);
-INSERT INTO order_lines (order_id, product_id, variant_id, price, quantity) VALUES (2, 2, 2, 3000, 3);
-INSERT INTO order_lines (order_id, product_id, variant_id, price, quantity) VALUES (3, 4, 1, 3000, 1);
-INSERT INTO order_lines (order_id, product_id, variant_id, price, quantity) VALUES (3, 5, 1, 3000, 1);
-INSERT INTO order_lines (order_id, product_id, variant_id, price, quantity) VALUES (3, 3, 1, 3000, 1);
-INSERT INTO order_lines (order_id, product_id, variant_id, price, quantity) VALUES (3, 3, 2, 3000, 1);
+INSERT INTO order_lines (order_id, product_id, variant_id, price, quantity) VALUES (1, 2, 3, 2500, 1);
 
+-- Order 2
+INSERT INTO order_lines (order_id, product_id, variant_id, price, quantity) VALUES (2, 1, 2, 2200, 3);
+INSERT INTO order_lines (order_id, product_id, variant_id, price, quantity) VALUES (2, 3, 4, 1800, 1);
+
+-- Order 3
+INSERT INTO order_lines (order_id, product_id, variant_id, price, quantity) VALUES (3, 2, 3, 2500, 2);
+
+-- Order 4
+INSERT INTO order_lines (order_id, product_id, variant_id, price, quantity) VALUES (4, 3, 4, 1800, 1);
+INSERT INTO order_lines (order_id, product_id, variant_id, price, quantity) VALUES (4, 1, 1, 2000, 2);
+
+-- Order 5
+INSERT INTO order_lines (order_id, product_id, variant_id, price, quantity) VALUES (5, 1, 2, 2200, 1);
+INSERT INTO order_lines (order_id, product_id, variant_id, price, quantity) VALUES (5, 2, 3, 2500, 1);
+
+-- Order 6
+INSERT INTO order_lines (order_id, product_id, variant_id, price, quantity) VALUES (6, 3, 4, 1800, 1);
 
 -- Costs breakdown table for order payment and shipping costs
 
 --
 -- Indexes
 --
+
+CREATE INDEX variants_product_id_idx ON variants (product_id);
 
 CREATE INDEX orders_customer_id_idx ON orders (customer_id);
 
