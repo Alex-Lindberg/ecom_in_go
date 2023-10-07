@@ -6,7 +6,6 @@ import (
 	"ecom_in_go/models/orderline"
 	"ecom_in_go/models/product"
 	"ecom_in_go/models/variant"
-	"fmt"
 )
 
 // Convert order domain object to DTO
@@ -28,8 +27,6 @@ func ToOrderResponse(domainOrder order.Order) order.OrderResponse {
 		CreatedAt: domainOrder.Customer.CreatedAt.String(),
 	}
 
-	fmt.Println("domainOrder.OrderLines", domainOrder.OrderLines)
-
 	// Map the order lines and included products
 	orderLines := make([]orderline.OrderLineResponse, len(domainOrder.OrderLines))
 	for i, ol := range domainOrder.OrderLines {
@@ -37,7 +34,6 @@ func ToOrderResponse(domainOrder order.Order) order.OrderResponse {
 		// Filter out the variant by orderline.VariantID
 		variant := variant.Variant{}
 		for _, v := range ol.Product.Variants {
-			fmt.Println(v.ID, ol.VariantID)
 			if v.ID == ol.VariantID {
 				variant = v
 				break
