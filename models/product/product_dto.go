@@ -20,3 +20,8 @@ type OrderLineProductResponse struct {
 	UpdatedAt string                  `json:"updatedAt"`
 	CreatedAt string                  `json:"createdAt"`
 }
+
+type OrderLineProductRequest struct {
+	Name    string                 `json:"name"`
+	Variant variant.VariantRequest `gorm:"foreignKey:ID" json:"variant"`
+}

@@ -3,7 +3,9 @@ package storage
 import (
 	"ecom_in_go/models/customer"
 	"ecom_in_go/models/order"
+	"ecom_in_go/models/orderline"
 	"ecom_in_go/models/product"
+	"ecom_in_go/models/variant"
 
 	"gorm.io/gorm"
 )
@@ -77,4 +79,47 @@ func (store *PGStore) GetOrdersByFilter(orderIDs []int, orderNumbers []string, c
 		return nil, err
 	}
 	return orders, nil
+}
+
+func (store *PGStore) GetOrCreateProductAndVariant(newProduct product.OrderLineProductRequest, variant variant.VariantRequest) (product.Product, error) {
+	var existingProduct product.Product
+	if err := store.DB.Preload("Variants").Where("name = ?", newProduct.Name).Find(&existingProduct).Error; err != nil {
+		if err := store.DB.Create(&newProduct).Error; err != nil {
+			return existingProduct, err
+		} //
+		return existingProduct, nil
+	}
+	return existingProduct, nil
+}
+
+func (store *PGStore) GetOrCreateCustomer(newCustomer customer.CustomerRequest) (customer.Customer, error) {
+	var existingCustomer customer.Customer
+	if err := store.DB.Where("email = ?", newCustomer.Email).Find(&existingCustomer).Error; err != nil {
+		if err := store.DB.Create(&newCustomer).Error; err != nil {
+			return existingCustomer, err
+		}
+		return existingCustomer, nil
+	}
+	return existingCustomer, nil
+}
+
+func (store *PGStore) GetOrCreateOrder(newOrder *order.Order) error {
+	var existingOrder order.Order
+	if err := store.DB.Where("order_number = ?", newOrder.OrderNumber).Find(&existingOrder).Error; err != nil {
+		if err := store.DB.Create(&newOrder).Error; err != nil {
+			return err
+		}
+		return nil
+	}
+	return nil
+}
+
+func (store *PGStore) CreateOrderLines(orderLines []orderline.OrderLine, orderID int) ([]orderline.OrderLine, error) {
+	if err := store.DB.CreateInBatches(orderLines, 100).Error; err != nil {
+		store.DB.Rollback()
+		return nil, err
+	}
+	store.DB.Commit()
+
+	return orderLines, nil
 }

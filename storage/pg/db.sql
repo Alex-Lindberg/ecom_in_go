@@ -6,7 +6,8 @@ CREATE TABLE products (
     id SERIAL PRIMARY KEY,
     "name" VARCHAR(255) NOT NULL,
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    UNIQUE ("name")
 );
 
 INSERT INTO products ("name") VALUES ('Product A');
@@ -17,21 +18,26 @@ INSERT INTO products ("name") VALUES ('Product C');
 CREATE TABLE variants (
     id SERIAL PRIMARY KEY,
     product_id INTEGER REFERENCES products(id) ON DELETE CASCADE,
+    sku VARCHAR(255) NOT NULL,
     "name" VARCHAR(255) NOT NULL,
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    UNIQUE (sku)
 );
+ALTER TABLE variants
+ADD CONSTRAINT unique_productId_name UNIQUE (product_id, "name");
 
-INSERT INTO variants (product_id, "name") VALUES (1, 'Variant A1');
-INSERT INTO variants (product_id, "name") VALUES (1, 'Variant A2');
-INSERT INTO variants (product_id, "name") VALUES (2, 'Variant B1');
-INSERT INTO variants (product_id, "name") VALUES (3, 'Variant C1');
+
+INSERT INTO variants (product_id, sku, "name") VALUES (1,'VA1', 'Variant A1');
+INSERT INTO variants (product_id, sku, "name") VALUES (1,'VA2', 'Variant A2');
+INSERT INTO variants (product_id, sku, "name") VALUES (2,'VB1', 'Variant B1');
+INSERT INTO variants (product_id, sku, "name") VALUES (3,'VC1', 'Variant C1');
 
 
 CREATE TABLE customers (
     id SERIAL PRIMARY KEY,
     "name" VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
@@ -48,6 +54,11 @@ CREATE TABLE orders (
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
+ALTER TABLE orders
+ADD CONSTRAINT unique_orderNumber UNIQUE (order_number);
+ALTER TABLE orders
+ADD CONSTRAINT unique_orderReference UNIQUE (order_reference);
+
 
 INSERT INTO orders (order_number, order_reference, customer_id) VALUES ('123', 'ORDER123', 1);
 INSERT INTO orders (order_number, order_reference, customer_id) VALUES ('124', 'ORDER124', 1);
@@ -66,6 +77,8 @@ CREATE TABLE order_lines (
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
+ALTER TABLE order_lines 
+ADD CONSTRAINT unique_orderId_productId_variantId UNIQUE (order_id, product_id, variant_id);
 
 -- Order 1
 INSERT INTO order_lines (order_id, product_id, variant_id, price, quantity) VALUES (1, 1, 1, 2000, 2);

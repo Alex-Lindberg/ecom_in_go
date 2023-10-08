@@ -9,6 +9,10 @@ To run I usually use:
 docker-compose up -d && docker-compose logs -f app
 ```
 
+## Routes
+
+@TODO: add routes table /w parameters
+
 ### Package structure
 
 Borrowed a structure form somewhere, using as a rough guidline.

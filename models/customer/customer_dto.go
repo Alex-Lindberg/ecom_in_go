@@ -7,3 +7,8 @@ type CustomerResponse struct {
 	UpdatedAt string `json:"updatedAt"`
 	CreatedAt string `json:"createdAt"`
 }
+
+type CustomerRequest struct {
+	Name  string `json:"name"`
+	Email string `json:"email"`
+}

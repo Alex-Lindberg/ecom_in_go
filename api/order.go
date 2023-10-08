@@ -1,6 +1,8 @@
 package api
 
 import (
+	"ecom_in_go/models/order"
+	"ecom_in_go/models/orderline"
 	"ecom_in_go/storage"
 	"ecom_in_go/transformers"
 	"encoding/json"
@@ -12,7 +14,11 @@ import (
 )
 
 type OrderHandler struct {
-	OrderStore storage.OrderStore
+	OrderStore     storage.OrderStore
+	OrderLineStore storage.OrderLineStore
+	CustomerStore  storage.CustomerStore
+	ProductStore   storage.ProductStore
+	VariantStore   storage.VariantStore
 }
 
 func (h *OrderHandler) GetOrders(w http.ResponseWriter, r *http.Request) {
@@ -94,6 +100,71 @@ func parseCommaSeparatedString(str string) ([]string, error) {
 		list = append(list, id)
 	}
 	return list, nil
+}
+
+func (h *OrderHandler) CreateOrder(w http.ResponseWriter, r *http.Request) {
+
+	// - Extract body
+	// - Parse into json
+	// - Validate
+	// - Check if Order exists
+	// - Check if Customer exists, else create
+	// - Check or create product
+	// - Check or create variant
+	// - Create order
+	// - Create order lines
+
+	// 1. Extract body
+	var orderRequest order.CreateOrderRequest
+	err := json.NewDecoder(r.Body).Decode(&orderRequest)
+
+	// if orderExists(orderRequest.OrderNumber) {
+	//     return nil, errors.New("order already exists")
+	// }
+
+	// 2. Check or create customer
+	customer, err := h.CustomerStore.GetOrCreateCustomer(orderRequest.Customer)
+	if err != nil {
+
+		println("Error creating order: %v\n", err)
+	}
+
+	// 4. Create the order
+	order := &order.Order{
+		OrderNumber: orderRequest.OrderNumber,
+		CustomerID:  customer.ID,
+		// Populate other fields
+	}
+	if err := h.OrderStore.GetOrCreateOrder(order).Error; err != nil {
+		// fatal error
+		println("Error creating order: %v\n", err)
+		return
+	}
+
+	// 5. Create order lines
+	var orderlines []orderline.OrderLineRequest
+	for _, ol := range orderRequest.OrderLines {
+		_, err := h.ProductStore.GetOrCreateProductAndVariant(ol.Product, ol.Product.Variant)
+		if err != nil {
+			println("Error creating order: %v\n", err)
+			return
+		}
+		orderLine := &orderline.OrderLineRequest{
+			OrderID:   order.ID,
+			ProductID: ol.ProductID,
+			VariantID: ol.VariantID,
+			Product:   ol.Product,
+			Quantity:  ol.Quantity,
+		}
+		orderlines = append(orderlines, *orderLine)
+	}
+	_, err = h.OrderLineStore.CreateOrderLines(orderlines, order.ID)
+	if err != nil {
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode({"success": true})
 }
 
 // parse comma separated string into list of ints'

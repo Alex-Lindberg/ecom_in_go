@@ -12,10 +12,11 @@ import (
 func ToOrderResponse(domainOrder order.Order) order.OrderResponse {
 	// Map the basic order details
 	orderResponse := order.OrderResponse{
-		ID:          domainOrder.ID,
-		OrderNumber: domainOrder.OrderNumber,
-		UpdatedAt:   domainOrder.UpdatedAt.String(),
-		CreatedAt:   domainOrder.CreatedAt.String(),
+		ID:             domainOrder.ID,
+		OrderNumber:    domainOrder.OrderNumber,
+		OrderReference: domainOrder.OrderReference,
+		UpdatedAt:      domainOrder.UpdatedAt.String(),
+		CreatedAt:      domainOrder.CreatedAt.String(),
 	}
 
 	// Map the customer detail
